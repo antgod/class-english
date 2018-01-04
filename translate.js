@@ -17,20 +17,19 @@ const createQuery = (search) => {
 }
 
 const trans = (word, callback) => request(`http://api.fanyi.baidu.com/api/trans/vip/translate?${createQuery(word)}`,  (error, response, body) => {
-  const data = JSON.parse(body).trans_result.map((item, key) => `${key+1}.${item.src}:${item.dst}`).join('\n')
-  callback(data)
+  callback(JSON.parse(body).trans_result.map((item, key) => `${key+1}.${item.src}:${item.dst}`).join('\n'))
 });
 
 const transFile = path => fs.exists(path, exists => {
   exists ? fs.readFile(path, (err, data) => {
     if (err) throw err;
     trans(data.toString(), (result) => {
-      fs.writeFile(`${path}.trans`, result, error => console.log)
+      fs.writeFile(`${path}.trans`, result, error => console.log(error || '写入完成'))
     })
   }) : console.log(path + '-文件不存在')
 })
 
 
 
-transFile('./t')
+transFile('./2')
 
