@@ -54,9 +54,7 @@ const translate = (word, callback) => request(createQuery(word),  (error, _, bod
 })
 
 const templates = (index, word, sound, trans, explains, url) => {
-  return `${index + 1}. ${word}${sound}:${trans.join(' ')}
-    - ${explains}
-    - ${url.url}`
+  return `${index + 1}. ${word}${sound}:${trans.join(' ')}-${url.url}${explains.map(explain => '\n    - ' + explain)}`
 }
 
 const translateFile = (src, target) => {
@@ -83,7 +81,7 @@ const translateFile = (src, target) => {
     const usefulWords = words.filter(word => !!word.trim())
     usefulWords.forEach((word, index) => {
       translate(word, ({ sound, url, explains, trans }) => {
-        results[index] = templates(index, word, sound ? `(${sound})` : '', trans, explains.length ? explains.join(' ') : '', url)
+        results[index] = templates(index, word, sound ? `(${sound})` : '', trans, explains, url)
         if (results.filter(identity).length === usefulWords.length) {
           fs.writeFile(target, results.join(newLine), error => log(info(`${target}-文件写入完成`)))
         }
