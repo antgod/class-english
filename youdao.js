@@ -52,9 +52,10 @@ const translate = (word, callback) => request(createQuery(word),  (error, _, bod
 
   callback(final)
 })
-
+// console.log(createQuery('fetch'))
 const templates = (index, word, sound, trans, explains, url) => {
-  return `${index + 1}. ${word}${sound}:${trans.join(' ')}-${url.url}${explains.map(explain => '\n    - ' + explain)}`
+  return `${index + 1}. ${word}${sound}:${trans.join(' ')}-${url.url}
+    - ${explains.join('\n    - ')}`
 }
 
 const translateFile = (src, target) => {
