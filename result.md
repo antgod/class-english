@@ -10,8 +10,8 @@
 - 异步轮询
 - 算法题，两道（背包，线表）
 - 英语库升级
-- 总结ant-datasource
-- 完成ramda库
+- 总结ant-datasource，ant-util数组工具
+- 完成ramda库，文章等
 
 ### 下周计划
 - react源码阅读
