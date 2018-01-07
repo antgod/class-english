@@ -52,9 +52,10 @@ const translate = (word, callback) => request(createQuery(word),  (error, _, bod
 
   callback(final)
 })
-// console.log(createQuery('fetch'))
+console.log('示例链接:', createQuery('well'))
 const templates = (index, word, sound, trans, explains, url) => {
-  const ex = explains.length ? `\n    - ${explains.join('\n    - ')}` : ''
+  const finalExplains = explains.filter(identity)
+  const ex = finalExplains.length ? `\n    - ${finalExplains.join('\n    - ')}` : ''
   return `${index + 1}. ${word}${sound}:${trans.join(' ')}-${url.url}${ex}`
 }
 
@@ -105,7 +106,7 @@ const translateFolder = (folder, subFolder = translated) => {
   })
 }
 
-const folders = ['read', 'new', 'api']
+const folders = ['read', 'new', 'api', 'awl']
 
 folders.forEach(folder => translateFolder(`./${folder}`))
 

@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "trans": "node translate.js"
+    "trans": "node youdao.js"
   },
   "dependencies": {
     "ant-util": "^1.3.5",
