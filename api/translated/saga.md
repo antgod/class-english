@@ -42,7 +42,10 @@
     - n. (Standard)人名；(英)斯坦达德；(德)施坦达德
 15. awesome('ɔːs(ə)m):太棒了-http://m.youdao.com/dict?le=eng&q=awesome
     - adj. 令人敬畏的；使人畏惧的；可怕的；极好的
-16. contrary:相反-http://m.youdao.com/dict?le=eng&q=contrary
+16. contrary('kɒntrərɪ):相反-http://m.youdao.com/dict?le=eng&q=contrary
+    - n. 相反；反面
+    - adj. 相反的；对立的
+    - adv. 相反地
 17. end up:最终-http://m.youdao.com/dict?le=eng&q=end+up
     - 结束；死亡
 18. alternatively(ɔːl'tɜːnətɪvlɪ):另外-http://m.youdao.com/dict?le=eng&q=alternatively

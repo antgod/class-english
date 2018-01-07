@@ -4,9 +4,10 @@ const fs = require('fs')
 const path = require('path')
 const util = require('ant-util').default
 const chalk = require('chalk')
+const json = require('./package.json')
 
 const { keys, guard, identity } = util
-const { gets } = util.plugins.exist
+const { gets, get } = util.plugins.exist
 
 const appKey = '2c799d86caea2093'
 const key = 'EraYiqPez2EBY3oiq62MxGqnePeMvFAA'
@@ -17,7 +18,11 @@ const error = chalk.red
 const info = chalk.green
 const seg = '/'
 const newLine = '\n'
-const translated = 'translated'
+
+const ignore = /(```[^`]+```)/g
+const transDef = json.translate || {}
+const translated = transDef.translated || 'translated'
+const folders = transDef.folders || []
 
 const createQuery = (search) => {
   const salt = Math.round(Math.random() * 10);
@@ -52,7 +57,7 @@ const translate = (word, callback) => request(createQuery(word),  (error, _, bod
 
   callback(final)
 })
-console.log('示例链接:', createQuery('well'))
+// console.log('示例链接:', createQuery('well'))
 const templates = (index, word, sound, trans, explains, url) => {
   const finalExplains = explains.filter(identity)
   const ex = finalExplains.length ? `\n    - ${finalExplains.join('\n    - ')}` : ''
@@ -77,8 +82,7 @@ const translateFile = (src, target) => {
       return
     }
     generatorDir(target)
-    const fileContent = read(src).toString()
-    const words = fileContent.split('\n')
+    const words = read(src).toString().replace(ignore, '').split('\n')
     const results = []
     const usefulWords = words.filter(word => !!word.trim())
     usefulWords.forEach((word, index) => {
@@ -105,8 +109,6 @@ const translateFolder = (folder, subFolder = translated) => {
     })
   })
 }
-
-const folders = ['read', 'new', 'api', 'awl']
 
 folders.forEach(folder => translateFolder(`./${folder}`))
 
