@@ -5,7 +5,9 @@
 npm i
 ```
 
-- 编写生词文件
+- 翻译文件
+
+1. 编写生词文件
 ```
 $ mkdir test && cd test
 & vim test
@@ -19,7 +21,7 @@ hello
 world
 ```
 
-package.json添加如下代码
+2. package.json添加如下代码
 ```
 {
   ...
@@ -30,7 +32,7 @@ package.json添加如下代码
 }
 ```
 
-执行翻译
+3. 执行翻译
 ```
 $ npm start
 ```
@@ -45,7 +47,7 @@ $ npm start
     - n. 世界；领域；世俗；全人类；物质生活
 ```
 
-你可以传递`translated`属性来修改翻译路径
+4. 你可以传递`translated`属性来修改翻译路径
 ```
 {
   ...
