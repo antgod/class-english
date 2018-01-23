@@ -15,6 +15,6 @@
     "utf8": "^3.0.0"
   },
   "translate": {
-    "folders": ["api", "awl", "reddit", "test"]
+    "folders": ["git", "awl", "reddit"]
   }
 }

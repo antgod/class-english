@@ -105,7 +105,7 @@ const translateFolder = (folder, subFolder = translated) => {
     const filePath = `${folder}/${file}`
     fs.stat(filePath, (_, stats) => {
       if(stats.isFile()) {
-        translateFile(filePath, path.resolve(folder, subFolder, `${file}.md`))
+        translateFile(filePath, path.resolve(folder, subFolder, `${file}`))
       }
     })
   })
