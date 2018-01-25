@@ -57,13 +57,31 @@ https://zef.me/the-100x-engineer-6d50a690a866
 首先我们来看看程序员这个团队。在sachman的调查中，他们专注与聚焦独立完成程序的能力。高效算法的联系，比如说："给出一个迷宫的标识，写一个
 查找出口路由的程序"，这正式好的程序员擅长的，有挑战的程序，并且编码完成它。每个程序员都有他们自己的任务队列，并且一个接一个的敲出来。
 
-敲代码~~
+- 敲代码
 
 如果你也喜欢这样，我确认有些地方你可以用这种方式工作。
 
 然而，这并不是我曾经工作过的所有场景。感谢上帝，坦白的说，很长时间，我都觉得这很无聊。
 
-我发现更有意思的是工程师这个角色。
+我发现更有意思的是工程师这个角色。工程师把想法做成现实中的工作产品。并且他们有宽广的观点。他们有一整套可用的工具来完成工作，当然，编程也是
+其中的一部分。
+
+坦白的说，我们应该吹嘘一个技能，
+
+- 统计不会说谎：
+
+a): 产业平均值：在已经提交的代码中，每1000行有15~50个错误。他进一步说在这之后代表了一些结构化层次的代码，也可能包括混合代码技术
+b): 微软应用程序：在测试中发现每1000行代码中有10~20个缺陷。在发布的代码中每1000行代码有0.5个缺陷。这结合了读取代码与测试功能的统计结果。
+c): Harlan Mills驱动cleanroom开发，一项可以达到1000行代码低于3个缺陷的比率技术在测试阶段。和线上阶段1000行代码0.1缺陷。在一些产品中，
+如航天软件中，如果使用系统化的结构开发方法，盯紧reviews，统计测试，可以达到接近500000代码中0个错误。
+
+我是说，我们可以尽我们所能的避免编程中以及我们在IDE中按下键引发的所有异常。
+
+所以，10倍的程序员，不错的注意。但是我说的是更高的目标，在2018年，世界将被改变。
+
+- 100倍程序员
+我喜欢可变的目标，他经常能让我们退一步说话并且在思想上所有转变。如果我们想成为100倍工程师，能对1倍的程序员有100倍的影响，我们应该怎么做呢？
+
 
 
 疑问：
@@ -71,6 +89,10 @@ Well, for one
 not all that motivating
 Typin’ the codez
 this is not the programming reality in any place where I have ever worked
+But to be frank, and I think I can say this here, for a skill we tend to brag about so much, we’re pretty damn bad at it.
+Industry Average: “about 15–50 errors per 1000 lines of delivered code.” He further says this is usually representative of code that has some level of structured programming behind it, but probably includes a mix of coding techniques.
+I say?—?we should avoid programming whenever we can and save the world from all those bugs we introduce every time we press a key in our IDE.
+I like stretch goals. They often lead to taking a step back and to big shifts in thinking.
 ```
 
 ambitious
@@ -108,8 +130,13 @@ maze
 boring
 perspective
 thus
-
+frank
+tend
+brag
+damn
+delivered
+defects
+stretch
+shifts
 academy
-plea
-adventures
-system
+accomplish
