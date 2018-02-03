@@ -2,7 +2,7 @@
 ### 原文链接
 https://zef.me/the-100x-engineer-6d50a690a866
 
-### 疑难句
+### 疑难句以及短语
 
 - Well, for one
 - not all that motivating
