@@ -46,35 +46,35 @@ mode:为你的config推出的全新属性。有两个选项：开发和生产环
 
 另外，entry,output也有默认配置了，这意味着你不需要配置才能工作。通过mode，在我们做了如此多的提取之后， 你的config文件难以置信的小。
 
-Legato means to play each note in sequence without gaps.
 # Legato意味着连续不间断的演奏每个节奏
 基于以上所做的事情，我们提供零配置平台来让你扩展。webpack最有价值的特性就是深度可扩展性。我们定义的(zero-config)你看起来像什么。当我们完成设计并且把我们的webpack预设发布，这就意味着你可以扩展zero-config成为唯一的并且为你的工作流、公司甚至框架社区打造一个完美的配置。
 
 ✂ Goodbye CommonsChunkPlugin
-We have deprecated and removed CommonsChunkPlugin, and have replaced it with a set of defaults and easily overridable API called optimization.splitChunks. Now out of the box, you will have shared chunks automatically generated for you in a variety of scenarios!
+# CommonsChunkPlugin再见
+我们准备弃用并移除CommonsChunkPlugin，替换成一个默认配置并且容易被`optimization.splitChunks`API替换，开箱即用，在各种场景中自动为你生成公共模块。
 
+关于我们做这个的更多信息和api风格，请看提交记录。
 
-For more information on why we did this, and what the API looks like, see this post!!
-
-webpack 4: Code Splitting, chunk graph and the splitChunks optimization
-
-webpack 4 made some major improvements to the chunk graph and added a new optimiztion for chunk splitting (which is a…
-medium.com	
-🔬WebAssembly Support
+# web模块化支持
 Webpack now by default supports import and export of any local WebAssembly module. This means that you can also write loaders that allow you to import Rust, C++, C and other WebAssembly host lang files directly.
+webpack4.0默认支持本地的web模块中的import和export。这意味着你可以写loaders直接支持在Rust, C++, C和任何其他模块化语言文件。
 
 🐐 Module Type’s Introduced + .mjs support
-Historically JavaScript has been the only first-class module type in webpack. This caused a lot of awkward pains for users where they would not be able to effectively have CSS/HTML Bundles, etc. We have completely abstracted the JavaScript specificity from our code base to allow for this new API. Currently built, we now have 5 module types implemented:
+# 模块类型介绍、.msj支持
+之前，webpack中的javascript是唯一的默认配置类型。用户不需要使用css/html bundles等造成了尴尬的麻烦。我们已经从我们的代码抽出了js特性，现在构建时候我们有五种类型实现。
 
-javascript/auto: (The default one in webpack 3) JavaScript module with all module systems enabled: CommonJS, AMD, ESM
-javascript/esm: EcmaScript modules, all other module system are not available (the default for .mjs files)
-javascript/dynamic: Only CommonJS & AMD; EcmaScript modules are not available
-json: JSON data, it’s available via require and import (the default for .json files)
-webassembly/experimental: WebAssembly modules (currently experimental and the default for .wasm files)
-In addition webpack now looks for the .wasm, .mjs, .js and .json extensions in this order to resolve
-What’s most exciting about this feature, is that now we can continue to work on our CSS and HTML module types (slated for webpack 4.x to 5). This would allow capabilities like HTML as your entry-point!
+javascript/auto: (webpack 3默认类型) 所有模块化系统均可使用: CommonJS, AMD, ESM
+javascript/esm: es模块化系统，其他模块化系统不可使用 (.mjs文件默认值)
+javascript/dynamic: 仅仅commonjs和amd，es模块化系统不可用
+json: json数据，通过require和import渠道导入可用（默认为.json的文件）
+webassembly/experimental: WebAssembly 模块 (.wasm 文件的默认值，目前还是试验阶段）
 
-🛑 If you use HtmlWebpackPlugin
+另外，webpack现在按照.wasm, .mjs, .js and .json顺序直接查找扩展名的文件。
+
+最让人激动的特征是，可以继续支持css和html模块类型（预计4.x或者5实现）。允许我们有能力把html作为入口文件。
+
+# 如果使用HtmlWebpackPlugin
+If you use HtmlWebpackPlugin
 For this release, we gave the ecosystem a month to upgrade any plugins or loaders to use the new webpack 4 API’s. However, Jan Nicklas has been away with work obligations, and therefore we have provided a patched fork of html-webpack-plugin . For now you can install it by doing the following:
 
 $> yarn add html-webpack-plugin@webpack-contrib/html-webpack-plugin
@@ -88,25 +88,25 @@ webpack 4: migration guide for plugins/loaders
 
 This guide targets plugin and loader authors
 medium.com	
-💖And so much more!
-There are so many more features that we heavily recommend you check them all out on our official change log.
+# 还有更多特性
+还有很多的特性，我们强烈的建议你查看我们的官方更新日志。
 
-🐣 Where’s the v4 Docs?
-We are very close to having out Migration Guide and v4 Docs Additions complete! To track the progress, or give a helping hand, please stop by our documentation repository, checkout the next branch, and help out!
+# webpack v4的文档在哪
+我们已经接近完成迁移用户指南和v4的新增文档。为了追踪过程或者搭把手帮我们构建，请顺便访问documentation repository，剪出next分支，并且获得最新帮助。
+
 
 🤷‍ What about <framework>-cli?
 Over the past 30 days we have worked closely with each of the frameworks to ensure that they are ready to support webpack 4 in their respective cli’s etc. Even popular library’s like lodash-es, RxJS are supporting the sideEffects flag, so by using their latest version you will see instant bundle size decreases out of the box.
 
 The AngularCLI team has said that they even plan on shipping their next major version (only ~week away) using webpack 4! If you want to know the status, reach out to them, and ask how you can help [instead of when it will be done].
 
-😒Why do you use so many emojis?
-Because we can have fun while creating an incredible product! You should try it sometime 😍.
+# 为什么用这么多表情？
+因为做出了难以置信的产品，我们很开心，你也可以试一下。
 
+# 下一步怎么办？
+我们已经开始着手准备webpack4.x和5的计划，包括但不仅限于：
 
-Sorry to hear friend! I’ll personally send you a screen shot of each one if you’d like 😍😍
-🎨 Whats next?
-We have already started planning our next set of features for webpack 4.x and 5! They include (but are not limited to):
-
+```
 ESM Module Target
 Persistent Caching
 Move WebAssembly support from experimental to stable. Add tree-shaking and dead code elimination!
@@ -118,14 +118,10 @@ URL/File Module Type
 Multi-threading
 Redefining our Organization Charter and Mission Statement
 Google Summer of Code (Separate Post Coming Soon!!!)
-🙇 Thank you. Again. 🙇
-To all of those involved on our contributor team, the core team, loader and plugin authors, those who submitted their first time commits, or assisted with troubleshooting: we cannot thank you enough. This product is for you and helped shaped by you.
+```
 
-
-2018 is about removing our fixed mindset, and start seeing JavaScript for the beautiful Renaissance it is! ❤
-We have said this many times in the past, but the community is what makes webpack strong, sustainable, and vibrant in this JavaScript Renaissance we live in today. Without you all, webpack would still be Yet Another Build Tool (YABT).
-
-No time to help contribute? Want to give back in other ways? Become a Backer or Sponsor to webpack by donating to our open collective. Open Collective not only helps support the Core Team, but also supports contributors who have spent significant time improving our organization on their free time! ❤
+# 再次谢过
+所有涉及贡献给我们代码的人，核心团队，loader或者插件作者。第一次提交commit的人，和协助我们解决问题的人，我们不得不感谢你们，这个产品为你打造，并且你塑造了它。
 ```
 
 announce
@@ -154,3 +150,15 @@ look forward
 sensible
 optimized
 optimization
+deprecated
+scenarios
+Assembly
+Historically
+awkward
+slate
+respective
+decreases 
+incredible
+sustainable
+heavily
+specificity
