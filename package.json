@@ -15,6 +15,6 @@
     "utf8": "^3.0.0"
   },
   "translate": {
-    "folders": ["git", "awl", "文章阅读"]
+    "folders": ["文章阅读"]
   }
 }
