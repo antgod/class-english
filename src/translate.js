@@ -1,157 +1,117 @@
-const md5 = require('js-md5');
 const request = require('request')
 const fs = require('fs')
 const path = require('path')
 const util = require('ant-util')
-const chalk = require('chalk')
 const json = require('../package.json')
-const { appKey, key, apiPath } = require('./common/constant')
+const { mkdir, statistics, log, info, warn, error, createQuery } = require('./common/common')
 
-const { keys, identity } = util
-const { get, gets } = util.plugins.exist
-
-const globalEnv = (env) => {
-  const rewrite = env
-  global.rewrite = rewrite
-}
-
-globalEnv(process.env.NODE_ENV)
-
-
-const log = console.log
-const error = chalk.red
-const warn = chalk.yellow
-const info = chalk.green
+const { identity } = util
+const { gets } = util.plugins.exist
 
 const newLine = '\n'
-const ignore = /```([\s\S]*)```|\([^)]*\)|（[^）]*）|[\u4e00-\u9fa5]|[,;，；]|#.*\n/g
+const ignoreFrag = /```([\s\S]*)```|\([^)]*\)|（[^）]*）|[\u4e00-\u9fa5]|[,;，；]|#.*\n/g
 const ignoreWord = /^\/$|^$/
 
-const createQuery = (search) => {
-  const salt = Math.round(Math.random() * 10);
-  const query = {
-    from: 'auto',
-    to: 'auto',
-    q: encodeURIComponent(search),
-    appKey,
-    salt,
-    sign: md5(`${appKey}${search}${salt}${key}`)
-  }
-  return `${apiPath}?${keys(query).map((key) => `${key}=${query[key]}`).join('&')}`
-}
+const statis = statistics()
 
-const translate = (word) => new Promise((res, rej) => {
-  request(createQuery(word),  (error, _, body) => {
-    if (error) {
-      log(error(`查询单词：${word}报错`))
+// 调用api接口翻译单词
+const translate = (word) => new Promise((res) => {
+  const url = createQuery(word)
+  request({
+    url,
+    timeout: 2000,
+  },  (err, _, body) => {
+    if (err) {
+      log(error(`查询单词：${word}接口异常`))
+      res({
+        success: false,
+      })
+    } else {
+      try{
+        const result = JSON.parse(body || {})
+        const final = gets(result, {
+          trans: [],
+          webs: [],
+          explains: [],
+          sound: '',
+          url: '',
+          success: true,
+        })({
+          trans: 'translation',
+          webs: 'web',
+          explains: 'basic.explains',
+          sound: 'basic.phonetic',
+          url: 'webdict',
+          success: 'success'
+        })
+        res(final)
+      } catch(e) {
+        log(body)
+      }
     }
-    const result = JSON.parse(body)
-    const final = gets(result, {
-      trans: [],
-      webs: [],
-      explains: [],
-      sound: '',
-      url: '',
-    })({
-      trans: 'translation',
-      webs: 'web',
-      explains: 'basic.explains',
-      sound: 'basic.phonetic',
-      url: 'webdict'
-    })
-    res(final)
   })
 })
 
+// 生成模板
 const templates = (index, word, sound, trans, explains, url, count) => {
   const finalExplains = explains.filter(identity)
-  const finalUrl = false ? `\n    ${url.url}` : ''
-  const ex = finalExplains.length ? `\n    - ${finalExplains.join('\n    - ')}` : ''
-  const r =  `${index}. ${word}${sound} : ${trans.join(' ')} (${count}次)${finalUrl}${ex}\n`
-  return r
+  const finalUrl = false ? `${newLine}    ${url.url}` : ''
+  const meaning = finalExplains.length ? `${newLine}    - ${finalExplains.join(`${newLine}    - `)}` : ''
+  const result =  `${index}. ${word}${sound} : ${trans.join(' ')} (${count}次)${finalUrl}${meaning}${newLine}`
+  return result
 }
-
-const analysisWords = (line) => {
-  return line.split(' ').filter(word => !ignoreWord.test(word))
-}
-
-const statistics = () => {
-  const all = {}
-  return {
-    collect: (words) => {
-      return words.forEach(word => {
-        all[word] = ++all[word] || 1
-      })
-    },
-    result: all,
-  }
-}
-
-const sta = statistics()
-
-function mkdir(dirname = './', options = {}) {  
-  let { cwd = process.cwd() } = options;  
-  let rel = path.normalize(path.relative(cwd, path.resolve(cwd, dirname))); //此处可去掉relative，只保留绝对路径，一般情况创建相对目录较多  
-  let paths = rel.split(/[\/\\\\]/);  
-  paths.reduce((base, el) => {  
-    let curPath = path.join(base, el);  
-    if (!fs.existsSync(curPath)) {  
-      fs.mkdirSync(curPath);  
-    }  
-    return curPath;  
-  }, cwd);  
-  return dirname;  
-}  
 
 // 读取、翻译以及生成翻译文件
-const translateFile = async (src, target, targetSource, genTotal) => {
-  const fileExisted = fs.existsSync(src)
-
+const translateFile = async (sourcePath, targetPath, { target, genTotal, rewrite }) => {
+  let needRewrite = ''
   // 处理文件夹
-  if (fs.existsSync(target)) {
+  if (fs.existsSync(targetPath)) {
     if (!rewrite && !genTotal) {
-      log(warn(`${target}-文件已存在`))
+      log(warn(`${targetPath}-文件已存在`))
       return
     } else if(rewrite && !genTotal) {
-      log(info(`${target}-文件重新生成`))
+      needRewrite = '重新'
     }
   } else {
-    const targetPath = target.split('/').reverse().slice(1).reverse().join('/')
-    if (!fs.existsSync(targetPath)) {
-      mkdir(targetPath, { cwd: targetSource })
-    }  
+    const targetFolder = targetPath.split('/').reverse().slice(1).reverse().join('/')
+    mkdir(targetFolder, { cwd: target })
   }
 
-  const handleFile = (read) => async (src, target) => {
-    const lines = read(src).toString().replace(ignore, '').split('\n')
-    const words = lines.reduce((words, line) => words.concat(analysisWords(line)), [])
-    sta.collect(words)
+  const analysisWords = (line) => {
+    return line.split(' ').filter(word => !ignoreWord.test(word))
+  }
 
-    if (!genTotal) {
+  const handleFile = (read) => async (sourcePath, targetPath) => {
+    const lines = read(sourcePath).toString().replace(ignoreFrag, '').split(newLine)
+    const words = lines.reduce((words, line) => words.concat(analysisWords(line)), [])
+    statis.collect(words)
+
+    if (genTotal) {
       // 写入数据
+      log(`${targetPath}-准备生成文件`)
       const results = []
       let i = 0
       while (i < words.length) {
         const item = words[i++]
-        const { sound, url, explains, trans } = await translate(item)
-        results.push(templates(i, item, sound ? `(${sound})` : '', trans, explains, url, 0))
+        const { success, sound, url, explains, trans } = await translate(item)
+        if (success) {
+          results.push(templates(i, item, sound ? `(${sound})` : '', trans, explains, url, 0))
+        }
       }
-      fs.writeFileSync(target, results.join(newLine))
-      log(info(`${target}-文件写入完成`))
+      log(warn(`${targetPath}-文件单词数:${results.length}`))
+      fs.writeFileSync(targetPath, results.join(newLine))
+      log(info(`${targetPath}-文件${needRewrite}写入完成`))
+    } else {
+      log(warn(`${targetPath}-文件收集完成，单词数：${words.length}`))
     }
   }
 
-  if(fileExisted) {
-    await handleFile(fs.readFileSync)(src, target) 
-  } else {
-    log(error('文件不存在'))
-  }
+  await handleFile(fs.readFileSync)(sourcePath, targetPath) 
 }
 
 // 遍历文件夹
-const translateFolder = (folder, target, genTotal) => {
+const translateFolder = async (folder, options) => {
   const children = fs.readdirSync(path.resolve(process.cwd(), folder))
-
   let i = 0
   while (i < children.length) {
     const child = children[i++]
@@ -159,50 +119,72 @@ const translateFolder = (folder, target, genTotal) => {
     const stats = fs.statSync(sourcePath)
     if (stats.isDirectory()) {
       const folderPath = path.join(folder, child)
-      translateFolder(folderPath, target, genTotal)
+      await translateFolder(folderPath, options)
     } else if(stats.isFile()){
-      const targetPath = path.resolve(process.cwd(), target, folder, child)
-      translateFile(sourcePath, targetPath, target, genTotal)
+      const targetPath = path.resolve(process.cwd(), options.target, folder, child)
+      await translateFile(sourcePath, targetPath, options)
     }
   }
 }
 
-// 创建翻译文件夹
-const trans =async (json) => {
-  const folders = get(json, 'translate.folders', [])
-  const target = get(json, 'translate.target', 'translate')
-  const genTotal = get(json, 'translate.total', false)
-  console.log(genTotal)
+// 翻译入口
+const entry = async (json) => {
+  const options = gets(json, {
+    folders: [],
+    target: 'translate',
+    genTotal: false,
+    rewrite: false,
+  })({
+    folders: 'translate.folders',
+    target: 'translate.target',
+    genTotal: 'translate.total',
+    rewrite: 'translate.rewrite'
+  })
 
-  const generatorDir = (target) => {
-    const targetPath = path.resolve(process.cwd(), target)
-    if (!fs.existsSync(targetPath)) {
-      fs.mkdirSync(targetPath)
-    } else {
-      log(info(`翻译后的文件在'${target}'文件夹中`))
-    }
-  }
-  generatorDir(target)
+  const { folders, target, genTotal } = options
+
+  // 生成翻译文件夹
+  mkdir(path.resolve(process.cwd(), target))
   
-  folders.forEach(folder => translateFolder(`./${folder}`, target, genTotal))
+  // 依次翻译目标文件夹
+  let i = 0
+  while (i < folders.length) {
+    const folder = folders[i++]
+    await translateFolder(`./${folder}`, options)
+  }
 
   if (genTotal) {
     // 分析依赖
-    const all = Object.keys(sta.result).map(word => {
-      const item = sta.result[word]
+    const result = statis.result
+    const all = Object.keys(result).map(word => {
+      const item = result[word]
       return { count: item, content: word.trim() }
     }).sort((pre, next) => next.count - pre.count)
+
     // 写入数据
+    log(`开始批量翻译单词，翻译后写入'${target}/total.md'文件中`)
     const results = []
     let i = 0
     while (i < all.length) {
       const item = all[i++]
-      const { sound, url, explains, trans } = await translate(item.content)
-      results.push(templates(i, item.content, sound ? `(${sound})` : '', trans, explains, url, item.count))
+      const { success, sound, url, explains, trans } = await translate(item.content)
+      if (success) {
+        results.push(templates(i, item.content, sound ? `(${sound})` : '', trans, explains, url, item.count))
+      }
+
+      if (i % 50 === 0) {
+        log(warn(`已翻译单词个数：${i}`))
+      } 
     }
     const targetPath = path.resolve(process.cwd(), target, 'total.md')
-    fs.writeFile(targetPath, results.join(newLine), error => log(info(`${targetPath}-文件写入完成`)))
+    fs.writeFile(targetPath, results.join(newLine), err => {
+      if(err) {
+        log(error(`${targetPath}-文件写入失败`))
+        return
+      }
+      log(info(`${targetPath}-文件写入完成`))
+    })
   }
 }
 
-trans(json)
+entry(json)
