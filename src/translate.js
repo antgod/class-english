@@ -22,7 +22,7 @@ const translate = (word) => new Promise((res) => {
     timeout: 2000,
   },  (err, _, body) => {
     if (err) {
-      log(error(`查询单词：${word}接口异常`))
+      log(error(`查询单词：${word}接口调用超时`))
       res({
         success: false,
       })
@@ -57,7 +57,8 @@ const templates = (index, word, sound, trans, explains, url, count) => {
   const finalExplains = explains.filter(identity)
   const finalUrl = false ? `${newLine}    ${url.url}` : ''
   const meaning = finalExplains.length ? `${newLine}    - ${finalExplains.join(`${newLine}    - `)}` : ''
-  const result =  `${index}. ${word}${sound} : ${trans.join(' ')} (${count}次)${finalUrl}${meaning}${newLine}`
+  const totalCount = count ? ` (${count}次)` : ''
+  const result =  `${index}. ${word}${sound} : ${trans.join(' ')}${totalCount}${finalUrl}${meaning}${newLine}`
   return result
 }
 
@@ -86,7 +87,7 @@ const translateFile = async (sourcePath, targetPath, { target, genTotal, rewrite
     const words = lines.reduce((words, line) => words.concat(analysisWords(line)), [])
     statis.collect(words)
 
-    if (genTotal) {
+    if (!genTotal) {
       // 写入数据
       log(`${targetPath}-准备生成文件`)
       const results = []
