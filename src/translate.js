@@ -22,10 +22,8 @@ const translate = (word) => new Promise((res) => {
     timeout: 2000,
   },  (err, _, body) => {
     if (err) {
-      log(error(`查询单词：${word}接口调用超时`))
-      res({
-        success: false,
-      })
+      log(error(`查询单词：${word}接口调用超时, 重试`))
+      res({ success: false })
     } else {
       try{
         const result = JSON.parse(body || {})
@@ -55,12 +53,20 @@ const translate = (word) => new Promise((res) => {
 // 生成模板
 const templates = (index, word, sound, trans, explains, url, count) => {
   const finalExplains = explains.filter(identity)
-  const finalUrl = false ? `${newLine}    ${url.url}` : ''
   const meaning = finalExplains.length ? `${newLine}    - ${finalExplains.join(`${newLine}    - `)}` : ''
   const totalCount = count ? ` (${count}次)` : ''
-  const link = ` <a href='${url.url}'>🔍</a>`
+  const link = ` <a target='_blank' href='http://www.youdao.com/w/${word}'>🔍</a>`
   const result =  `${index}. ${word}${sound} : ${trans.join(' ')}${link}${totalCount}${meaning}${newLine}`
   return result
+}
+
+const translateGuard = async ({ word, count, i }, results) => {
+  const { success, sound, url, explains, trans } = await translate(word)
+  if (success) {
+    results.push(templates(i, word, sound ? `(${sound})` : '', trans, explains, url, count))
+  } else {
+    await translateGuard({ word, count, i }, results)
+  }
 }
 
 // 读取、翻译以及生成翻译文件
@@ -94,11 +100,8 @@ const translateFile = async (sourcePath, targetPath, { target, genTotal, rewrite
       const results = []
       let i = 0
       while (i < words.length) {
-        const item = words[i++]
-        const { success, sound, url, explains, trans } = await translate(item)
-        if (success) {
-          results.push(templates(i, item, sound ? `(${sound})` : '', trans, explains, url, 0))
-        }
+        const word = words[i++]
+        await translateGuard({ word, count: 0, i }, results)
       }
       log(warn(`${targetPath}-文件单词数:${results.length}`))
       fs.writeFileSync(targetPath, results.join(newLine))
@@ -168,11 +171,12 @@ const entry = async (json) => {
     const results = []
     let i = 0
     while (i < all.length) {
-      const item = all[i++]
-      const { success, sound, url, explains, trans } = await translate(item.content)
-      if (success) {
-        results.push(templates(i, item.content, sound ? `(${sound})` : '', trans, explains, url, item.count))
-      }
+      const word = all[i++]
+      await translateGuard({
+        word: word.content,
+        count: word.count,
+        i,
+      }, results)
 
       if (i % 50 === 0) {
         log(warn(`已翻译单词个数：${i}`))
