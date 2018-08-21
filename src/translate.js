@@ -55,7 +55,7 @@ const templates = (index, word, sound, trans, explains, url, count) => {
   const finalExplains = explains.filter(identity)
   const meaning = finalExplains.length ? `${newLine}    - ${finalExplains.join(`${newLine}    - `)}` : ''
   const totalCount = count ? ` (${count}次)` : ''
-  const link = ` <a target='_blank' href='http://www.youdao.com/w/${word}'>🔍</a>`
+  const link = ` <a target='_blank' rel='nofollow noopener noreferrer' href='http://www.youdao.com/w/${word}'>🔍</a>`
   const result =  `${index}. ${word}${sound} : ${trans.join(' ')}${link}${totalCount}${meaning}${newLine}`
   return result
 }
