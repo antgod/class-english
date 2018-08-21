@@ -58,7 +58,8 @@ const templates = (index, word, sound, trans, explains, url, count) => {
   const finalUrl = false ? `${newLine}    ${url.url}` : ''
   const meaning = finalExplains.length ? `${newLine}    - ${finalExplains.join(`${newLine}    - `)}` : ''
   const totalCount = count ? ` (${count}次)` : ''
-  const result =  `${index}. ${word}${sound} : ${trans.join(' ')}${totalCount}${finalUrl}${meaning}${newLine}`
+  const link = ` <a href='${url.url}'>🔍</a>`
+  const result =  `${index}. ${word}${sound} : ${trans.join(' ')}${link}${totalCount}${meaning}${newLine}`
   return result
 }
 
