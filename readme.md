@@ -26,11 +26,19 @@ world
 {
   ...
   "translate": {
-    "folders": ["test"]
+    "folders": ["test"],
+    "target": "translate",
+    "rewrite": true,
+    "total": true
   }
   ...
 }
 ```
+<pre>
+target：翻译后文件夹目录名
+rewrite：是否重写已经翻译过的文件
+total：是否生成一个翻译文件，这里有统计单词出现个数
+</pre>
 
 3. 执行翻译
 ```
