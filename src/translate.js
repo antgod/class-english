@@ -96,14 +96,13 @@ const translateFile = async (sourcePath, targetPath, { target, genTotal, rewrite
 
     if (!genTotal) {
       // 写入数据
-      log(`${targetPath}-准备生成文件`)
+      log(warn(`${targetPath}-准备生成文件,文件单词数:${words.length}`))
       const results = []
       let i = 0
       while (i < words.length) {
         const word = words[i++]
         await translateGuard({ word, count: 0, i }, results)
       }
-      log(warn(`${targetPath}-文件单词数:${results.length}`))
       fs.writeFileSync(targetPath, results.join(newLine))
       log(info(`${targetPath}-文件${needRewrite}写入完成`))
     } else {
