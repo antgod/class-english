@@ -18,7 +18,7 @@
   "translate": {
     "folders": ["单词"],
     "target": "translate",
-    "rewrite": false,
+    "rewrite": true,
     "total": true
   }
 }

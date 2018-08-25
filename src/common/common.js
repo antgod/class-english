@@ -46,6 +46,15 @@ const createQuery = (search) => {
   return `${apiPath}?${keys(query).map((key) => `${key}=${query[key]}`).join('&')}`
 }
 
+const chunk = (all, count) => {
+  const array = []
+  let index = 0
+  while(index < all.length) {
+    array.push(all.slice(index, index += count));
+  }
+  return array
+}
+
 const log = console.log
 const info = chalk.green
 const warn = chalk.yellow
@@ -55,6 +64,7 @@ module.exports = {
   mkdir, 
   statistics,
   createQuery,
+  chunk,
   log,
   info,
   warn,

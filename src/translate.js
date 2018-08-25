@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 const util = require('ant-util')
 const json = require('../package.json')
-const { mkdir, statistics, log, info, warn, error, createQuery } = require('./common/common')
+const { mkdir, statistics, log, info, warn, error, createQuery, chunk } = require('./common/common')
 
 const { identity } = util
 const { gets } = util.plugins.exist
@@ -56,16 +56,16 @@ const templates = (index, word, sound, trans, explains, url, count) => {
   const meaning = finalExplains.length ? `${newLine}    - ${finalExplains.join(`${newLine}    - `)}` : ''
   const totalCount = count ? ` (${count}次)` : ''
   const link = ` <a target='_blank' rel='nofollow noopener noreferrer' href='http://www.youdao.com/w/${word}'>🔍</a>`
-  const result =  `${index}. ${word}${sound} : ${trans.join(' ')}${link}${totalCount}${meaning}${newLine}`
+  const result =  `${index}. ${word}${sound} : ${link}${totalCount}${trans.join(' ')}${meaning}${newLine}`
   return result
 }
 
 const translateGuard = async ({ word, count, i }, results) => {
   const { success, sound, url, explains, trans } = await translate(word)
   if (success) {
-    results.push(templates(i, word, sound ? `(${sound})` : '', trans, explains, url, count))
+    return templates(i, word, sound ? `(${sound})` : '', trans, explains, url, count)
   } else {
-    await translateGuard({ word, count, i }, results)
+    return await translateGuard({ word, count, i }, results)
   }
 }
 
@@ -97,12 +97,12 @@ const translateFile = async (sourcePath, targetPath, { target, genTotal, rewrite
     if (!genTotal) {
       // 写入数据
       log(warn(`${targetPath}-准备生成文件,文件单词数:${words.length}`))
-      const results = []
-      let i = 0
-      while (i < words.length) {
-        const word = words[i++]
-        await translateGuard({ word, count: 0, i }, results)
-      }
+      const results = await Promise.all(words.map((word, i) => translateGuard({
+        word: word,
+        count: 0,
+        i: i + 1,
+      })))
+
       fs.writeFileSync(targetPath, results.join(newLine))
       log(info(`${targetPath}-文件${needRewrite}写入完成`))
     } else {
@@ -167,20 +167,23 @@ const entry = async (json) => {
 
     // 写入数据
     log(`开始批量翻译单词，翻译后写入'${target}/total.md'文件中`)
-    const results = []
-    let i = 0
-    while (i < all.length) {
-      const word = all[i++]
-      await translateGuard({
+    
+    let results = []
+    const groups = chunk(all, 100)
+
+    let groupIndex = 0
+    while (groupIndex < groups.length) {
+      const group = groups[groupIndex]
+      results = results.concat(await Promise.all(group.map((word, i) => translateGuard({
         word: word.content,
         count: word.count,
-        i,
-      }, results)
-
-      if (i % 50 === 0) {
-        log(warn(`已翻译单词个数：${i}`))
-      } 
+        i: groupIndex * 100 + i + 1,
+      }))))
+      log(warn(`已翻译单词个数：${results.length}`))
+      groupIndex++
     }
+
+    // 写入数据
     const targetPath = path.resolve(process.cwd(), target, 'total.md')
     fs.writeFile(targetPath, results.join(newLine), err => {
       if(err) {
@@ -193,3 +196,4 @@ const entry = async (json) => {
 }
 
 entry(json)
+
