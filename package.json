@@ -16,9 +16,9 @@
     "verror": "^1.10.0"
   },
   "translate": {
-    "folders": ["单词"],
+    "folders": ["单词", "专业"],
     "target": "translate",
     "rewrite": true,
-    "total": true
+    "total": false
   }
 }
