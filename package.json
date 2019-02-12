@@ -16,7 +16,7 @@
     "verror": "^1.10.0"
   },
   "translate": {
-    "folders": ["文章阅读/react"],
+    "folders": ["read"],
     "target": "translate",
     "rewrite": true,
     "total": false
