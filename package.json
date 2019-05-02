@@ -16,7 +16,7 @@
     "verror": "^1.10.0"
   },
   "translate": {
-    "folders": ["read"],
+    "folders": ["word/3"],
     "target": "translate",
     "rewrite": true,
     "total": false
