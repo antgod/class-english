@@ -16,7 +16,7 @@
     "verror": "^1.10.0"
   },
   "translate": {
-    "folders": ["word/unawl"],
+    "folders": ["word/unawl/current"],
     "target": "translate",
     "rewrite": true,
     "total": false
